@@ -6,9 +6,16 @@ import WebKit
  
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
+
+public protocol MarkdownViewDelegate: NSObjectProtocol {
+    func markdownView(_ markdownView: MarkdownView, webView: WKWebView, didFinish navigation: WKNavigation!)
+    func markdownView(_ markdownView: MarkdownView, webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error)
+}
+
 open class MarkdownView: UIView {
 
-  private var webView: WKWebView?
+  public var webView: WKWebView?
+   public weak var delegate: MarkdownViewDelegate?
   private var updateHeightHandler: UpdateHeightHandler?
   
   private var intrinsicContentHeight: CGFloat? {
@@ -118,6 +125,14 @@ extension MarkdownView: WKNavigationDelegate {
     }
 
   }
+    
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.delegate?.markdownView(self, webView: webView, didFinish: navigation)
+    }
+    
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        self.delegate?.markdownView(self, webView: webView, didFail: navigation, withError: error)
+    }
 }
 
 // MARK: -
